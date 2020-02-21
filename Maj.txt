@@ -1,0 +1,5 @@
+Maj selon les commit :
+1.0 :
+- Génération d'un echiquier et de ses pions
+- Ajout d'une fonction qui traduit l'ecriture humaine en position H4 -> 8,4
+- Ajout d'une fonction permettant de déplacer les pions (fonction pas encore utilisé dans se commit)
