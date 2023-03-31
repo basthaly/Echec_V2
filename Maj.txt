@@ -3,3 +3,8 @@ Maj selon les commit :
 - Génération d'un echiquier et de ses pions
 - Ajout d'une fonction qui traduit l'ecriture humaine en position H4 -> 8,4
 - Ajout d'une fonction permettant de déplacer les pions (fonction pas encore utilisé dans se commit)
+
+1.1 :
+- Amélioration du code déja existant
+- Ajout de vérification du joueur qui joue
+- Ajout d'une méthode permettant de vérifier si la position donné est dans l'échiquier
