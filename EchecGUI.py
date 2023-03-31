@@ -25,7 +25,7 @@ class FenetrePersonnalisee(tk.Tk):
         self.update_idletasks()
 
         self.selected_piece = None
-        self.selected_piece_coords = Nonek
+        self.selected_piece_coords = None
 
         self.inverser_echiquier = False
         self.fullscreen = False

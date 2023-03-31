@@ -15,3 +15,8 @@ Maj selon les commit :
 - Fullscreen disponible
 - L'échiquier s'adapte automatiquement à la taille de l'écran
 - Inversion de l'échiquier possible
+
+1.3 :
+- Ajout de la possibilité de déplacer une pièce
+- La gestion de tour est incluse (le blanc commence suivi du noir et ainsi de suite)
+- Une couleur jaune indique la pièce choisite
