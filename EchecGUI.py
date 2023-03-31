@@ -20,8 +20,12 @@ class FenetrePersonnalisee(tk.Tk):
         self.menu()
 
         self.canvas.bind("<Configure>", self.redessiner_echiquier)
+        self.canvas.bind("<Button-1>", self.mouse_click)
         self.bind("<Configure>", self.on_resize)
         self.update_idletasks()
+
+        self.selected_piece = None
+        self.selected_piece_coords = Nonek
 
         self.inverser_echiquier = False
         self.fullscreen = False
@@ -31,6 +35,27 @@ class FenetrePersonnalisee(tk.Tk):
         self.mise_a_jour_piece_images()
 
         self.redessiner_echiquier()
+
+    def mouse_click(self, event):
+        x, y = event.x // self.case_taille, event.y // self.case_taille
+        if self.inverser_echiquier:
+            x, y = 7 - x, 7 - y
+
+        if self.selected_piece:
+            if (y, x) != self.selected_piece_coords:
+                self.move_piece(self.selected_piece_coords, (y, x))
+            self.selected_piece = None
+            self.selected_piece_coords = None
+        else:
+            piece = self.jeu.echiquier[y][x]
+            if piece != 0 and self.jeu.piece_couleur(piece) == self.jeu.joueur:
+                self.selected_piece = piece
+                self.selected_piece_coords = (y, x)
+
+        self.redessiner_echiquier()
+
+    def move_piece(self, start, end):
+        self.jeu.action(start, end, self.jeu.joueur)
 
     def on_resize(self, event=None):
         self.case_taille = self.calculer_case_taille()
@@ -71,6 +96,8 @@ class FenetrePersonnalisee(tk.Tk):
                 # self.canvas.create_image(x, y, image=image, anchor=tk.NW, tags=("piece",))
 
                 piece = self.jeu.echiquier[j][i]
+                if (j, i) == self.selected_piece_coords:
+                    self.canvas.create_rectangle(x, y, x + self.case_taille, y + self.case_taille, fill="yellow")
                 if piece != 0:
                     couleur = "blanc" if piece > 0 else "noir"
                     nom_piece = self.jeu.piece_nom(abs(piece))
