@@ -20,3 +20,11 @@ Maj selon les commit :
 - Ajout de la possibilité de déplacer une pièce
 - La gestion de tour est incluse (le blanc commence suivi du noir et ainsi de suite)
 - Une couleur jaune indique la pièce choisite
+
+1.4 :
+- Ajout des restriction de déplacement de pièce
+- Choses à travailler pour la v1.5 :
+    - Rock
+    - Roi qui peut être en Echec
+    - Promotion de pion
+    - Amélioration de l'interface (Message d'erreur, etc...)

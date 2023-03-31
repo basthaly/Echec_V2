@@ -15,8 +15,8 @@ class Jeu_Echec:
     2 (ou -2) : Tour
     3 (ou -3) : Cavalier
     4 (ou -4) : Fou
-    5 (ou -5) : Dame
-    6 (ou -6) : Roi
+    5 (ou -5) : Roi
+    6 (ou -6) : Dame
 
     Les cases vides de l'échiquier sont représentées par le chiffre 0.
     Ainsi, chaque case de l'échiquier contient un entier.
@@ -89,15 +89,184 @@ class Jeu_Echec:
         return 0 <= x < 8 and 0 <= y < 8
     
     def action(self, p1, p2, joueur):
-        if self.echiquier[p1[0]][p1[1]] * joueur > 0:  # Vérifie si la pièce appartient au joueur actuel
-            self.tour += 1
-            self.echiquier[p2[0]][p2[1]] = self.echiquier[p1[0]][p1[1]]
-            self.echiquier[p1[0]][p1[1]] = 0
-            self.joueur = -joueur  # Change le joueur actuel
+        piece = self.echiquier[p1[0]][p1[1]]
+        valid_moves = []
+
+        if piece * joueur > 0:  # Vérifie si la pièce appartient au joueur actuel
+            piece_type = abs(piece)
+
+            if piece_type == 1:
+                valid_moves = self.pion_mouvements_valides(*p1)
+            elif piece_type == 2:
+                valid_moves = self.tour_mouvements_valides(*p1)
+            elif piece_type == 3:
+                valid_moves = self.cavalier_mouvements_valides(*p1)
+            elif piece_type == 4:
+                valid_moves = self.fou_mouvements_valides(*p1)
+            elif piece_type == 5:
+                valid_moves = self.roi_mouvements_valides(*p1)
+            elif piece_type == 6:
+                valid_moves = self.dame_mouvements_valides(*p1)
+
+            if p2 in valid_moves:  # Vérifie si le mouvement est valide
+                self.tour += 1
+                self.echiquier[p2[0]][p2[1]] = self.echiquier[p1[0]][p1[1]]
+                self.echiquier[p1[0]][p1[1]] = 0
+                self.joueur = -joueur  # Change le joueur actuel
+            else:
+                print("Mouvement non valide.")
         else:
-            print ("C'est au tour du joueur", joueur, "de jouer.")
+            print("C'est au tour du joueur", joueur, "de jouer.")
 
     def deplace(self,p1,p2):
         pos1=self.Tr_pos(p1)
         pos2=self.Tr_pos(p2)
         self.action(pos1,pos2,self.joueur)
+
+    def pion_mouvements_valides(self, y, x):
+        valid_moves = []
+        piece = self.echiquier[y][x]
+        piece_couleur = self.piece_couleur(piece)
+
+        if piece_couleur is None:
+            return []
+
+        forward = -1 if piece_couleur == 1 else 1
+        start_rank = 6 if piece_couleur == 1 else 1
+
+        # Mouvement en avant d'une case
+        if self.est_dans_echiquier(x, y + forward) and self.echiquier[y + forward][x] == 0:
+            valid_moves.append((y + forward, x ))
+
+        # Mouvement en avant de deux cases si le pion est sur sa rangée initiale
+        if y == start_rank and self.echiquier[y + forward][x] == 0 and self.echiquier[y + 2 * forward][x] == 0:
+            valid_moves.append((y + 2 * forward,x))
+
+        # Mouvements diagonaux pour capturer une pièce adverse
+        for dx in [-1, 1]:
+            if self.est_dans_echiquier(x + dx, y + forward) and self.piece_couleur(self.echiquier[y + forward][x + dx]) == -piece_couleur:
+                valid_moves.append((y + forward, x + dx))
+
+        return valid_moves
+    
+    def tour_mouvements_valides(self, y, x):
+        valid_moves = []
+        piece = self.echiquier[y][x]
+        piece_couleur = self.piece_couleur(piece)
+
+        if piece_couleur is None:
+            return []
+
+        # Vérifier les mouvements dans les 4 directions : haut, bas, gauche et droite
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+
+            # Continuer dans la direction actuelle jusqu'à ce que l'on rencontre une pièce ou que l'on sorte de l'échiquier
+            while self.est_dans_echiquier(nx, ny):
+                target_piece = self.echiquier[ny][nx]
+                target_piece_couleur = self.piece_couleur(target_piece)
+
+                if target_piece_couleur != piece_couleur:
+                    valid_moves.append((ny, nx))
+
+                if target_piece != 0:  # Arrêter le mouvement lorsque l'on rencontre une pièce
+                    break
+
+                nx += dx
+                ny += dy
+
+        return valid_moves
+    
+    def cavalier_mouvements_valides(self, y, x):
+        valid_moves = []
+        piece = self.echiquier[y][x]
+        piece_couleur = self.piece_couleur(piece)
+
+        if piece_couleur is None:
+            return []
+
+        # Vérifier les mouvements en forme de L
+        mouvements = [
+            (1, 2), (1, -2), (-1, 2), (-1, -2),
+            (2, 1), (2, -1), (-2, 1), (-2, -1)
+        ]
+        for dx, dy in mouvements:
+            nx, ny = x + dx, y + dy
+
+            if self.est_dans_echiquier(nx, ny):
+                target_piece = self.echiquier[ny][nx]
+                target_piece_couleur = self.piece_couleur(target_piece)
+
+                if target_piece_couleur != piece_couleur:
+                    valid_moves.append((ny, nx))
+
+        return valid_moves
+    
+    def fou_mouvements_valides(self, y, x):
+        valid_moves = []
+        piece = self.echiquier[y][x]
+        piece_couleur = self.piece_couleur(piece)
+
+        if piece_couleur is None:
+            return []
+
+        # Vérifier les mouvements diagonaux
+        directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+
+            # Continuer dans la direction actuelle jusqu'à ce que l'on rencontre une pièce ou que l'on sorte de l'échiquier
+            while self.est_dans_echiquier(nx, ny):
+                target_piece = self.echiquier[ny][nx]
+                target_piece_couleur = self.piece_couleur(target_piece)
+
+                if target_piece_couleur != piece_couleur:
+                    valid_moves.append((ny, nx))
+
+                if target_piece != 0:  # Arrêter le mouvement lorsque l'on rencontre une pièce
+                    break
+
+                nx += dx
+                ny += dy
+
+        return valid_moves
+    
+    def roi_mouvements_valides(self, y, x):
+        valid_moves = []
+        piece = self.echiquier[y][x]
+        piece_couleur = self.piece_couleur(piece)
+
+        if piece_couleur is None:
+            return []
+
+        # Vérifier les mouvements dans toutes les directions
+        directions = [
+            (1, 0), (0, 1), (-1, 0), (0, -1),  # Mouvements verticaux et horizontaux
+            (1, 1), (1, -1), (-1, 1), (-1, -1)  # Mouvements diagonaux
+        ]
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+
+            if self.est_dans_echiquier(nx, ny):
+                target_piece = self.echiquier[ny][nx]
+                target_piece_couleur = self.piece_couleur(target_piece)
+
+                if target_piece_couleur != piece_couleur:
+                    valid_moves.append((ny, nx))
+
+        return valid_moves
+    
+    def dame_mouvements_valides(self, y, x):
+        valid_moves = []
+        piece = self.echiquier[y][x]
+        piece_couleur = self.piece_couleur(piece)
+
+        if piece_couleur is None:
+            return []
+        
+        valid_moves.append(self.tour_mouvements_valides(y, x))
+        valid_moves.append(self.fou_mouvements_valides(y, x))
+        valid_moves=(valid_moves[0]+valid_moves[1])
+
+        return valid_moves
