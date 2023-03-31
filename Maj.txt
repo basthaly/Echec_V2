@@ -8,3 +8,10 @@ Maj selon les commit :
 - Amélioration du code déja existant
 - Ajout de vérification du joueur qui joue
 - Ajout d'une méthode permettant de vérifier si la position donné est dans l'échiquier
+
+1.2 :
+- Création interface graphique
+- 3 options de taille (480p, 720p, 1080p)
+- Fullscreen disponible
+- L'échiquier s'adapte automatiquement à la taille de l'écran
+- Inversion de l'échiquier possible
