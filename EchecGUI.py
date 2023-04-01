@@ -26,6 +26,10 @@ class FenetrePersonnalisee(tk.Tk):
 
         self.selected_piece = None
         self.selected_piece_coords = None
+        self.roque_possible = {
+            'blanc': {'petit_roque': True, 'grand_roque': True},
+            'noir': {'petit_roque': True, 'grand_roque': True}
+        }
 
         self.inverser_echiquier = False
         self.fullscreen = False
@@ -33,7 +37,6 @@ class FenetrePersonnalisee(tk.Tk):
         self.piece_selectionnee = None
 
         self.mise_a_jour_piece_images()
-
         self.redessiner_echiquier()
 
     def mouse_click(self, event):

@@ -23,8 +23,10 @@ Maj selon les commit :
 
 1.4 :
 - Ajout des restriction de déplacement de pièce
-- Choses à travailler pour la v1.5 :
+
+1.5 :
+- Roi qui peut être en Echec
+- Choses à travailler pour la v1.6 :
     - Rock
-    - Roi qui peut être en Echec
     - Promotion de pion
     - Amélioration de l'interface (Message d'erreur, etc...)

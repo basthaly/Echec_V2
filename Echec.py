@@ -90,6 +90,7 @@ class Jeu_Echec:
     
     def action(self, p1, p2, joueur):
         piece = self.echiquier[p1[0]][p1[1]]
+        dest_piece = self.echiquier[p2[0]][p2[1]]
         valid_moves = []
 
         if piece * joueur > 0:  # Vérifie si la pièce appartient au joueur actuel
@@ -109,10 +110,17 @@ class Jeu_Echec:
                 valid_moves = self.dame_mouvements_valides(*p1)
 
             if p2 in valid_moves:  # Vérifie si le mouvement est valide
-                self.tour += 1
-                self.echiquier[p2[0]][p2[1]] = self.echiquier[p1[0]][p1[1]]
+                self.echiquier[p2[0]][p2[1]] = piece
                 self.echiquier[p1[0]][p1[1]] = 0
-                self.joueur = -joueur  # Change le joueur actuel
+                if self.est_en_echec(joueur):
+                    self.echiquier[p1[0]][p1[1]] = piece
+                    self.echiquier[p2[0]][p2[1]] = dest_piece
+                    print("Ce mouvement mettrait votre roi en échec. Veuillez jouer un autre coup.")
+                else:  
+                    self.tour += 1
+                    self.joueur = -joueur  # Change le joueur actuel
+                    if self.est_en_echec(self.joueur):
+                        print("Échec!")
             else:
                 print("Mouvement non valide.")
         else:
@@ -255,6 +263,12 @@ class Jeu_Echec:
                 if target_piece_couleur != piece_couleur:
                     valid_moves.append((ny, nx))
 
+        # # Ajout des mouvements de roque
+        # if self.roque_valide(2, x, self.joueur):
+        #     valid_moves.append((2, x))
+        # if self.roque_valide(6, x, self.joueur):
+        #     valid_moves.append((6, x))
+
         return valid_moves
     
     def dame_mouvements_valides(self, y, x):
@@ -270,3 +284,89 @@ class Jeu_Echec:
         valid_moves=(valid_moves[0]+valid_moves[1])
 
         return valid_moves
+
+    def est_en_echec(self, joueur):
+        roi_position = None
+
+        # Trouver la position du roi
+        for x in range(8):
+            for y in range(8):
+                if self.echiquier[y][x] == 5 * joueur:
+                    roi_position = (y, x)
+                    break
+
+        # Vérifier si une pièce adverse menace le roi
+        for x in range(8):
+            for y in range(8):
+                piece = self.echiquier[y][x]
+                if piece * joueur < 0:  # Si la pièce est adverse
+                    piece_type = abs(piece)
+
+                    if piece_type == 1:
+                        valid_moves = self.pion_mouvements_valides(y, x)
+                    elif piece_type == 2:
+                        valid_moves = self.tour_mouvements_valides(y, x)
+                    elif piece_type == 3:
+                        valid_moves = self.cavalier_mouvements_valides(y, x)
+                    elif piece_type == 4:
+                        valid_moves = self.fou_mouvements_valides(y, x)
+                    elif piece_type == 5:
+                        valid_moves = self.roi_mouvements_valides(y, x)
+                    elif piece_type == 6:
+                        valid_moves = self.dame_mouvements_valides(y, x)
+
+                    if roi_position in valid_moves:
+                        return True
+
+        return False
+    
+    # def roque_valide(self, y, x, joueur):
+    #     if self.echiquier[y][x] != 5 * joueur:
+    #         return False
+
+    #     if self.echiquier[y][x] * joueur <= 0:
+    #         return False
+
+    #     if self.est_en_echec(joueur):
+    #         return False
+
+    #     if y == 2:  # Roque avec la tour de la colonne A
+    #         if not (self.echiquier[0][x] == 4 * joueur and self.echiquier[1][x] == 0 and self.echiquier[3][x] == 0):
+    #             return False
+    #         for i in range(1, 3):
+    #             if self.est_attaque(i, x, -joueur):
+    #                 return False
+    #     elif y == 6:  # Roque avec la tour de la colonne H
+    #         if not (self.echiquier[7][x] == 4 * joueur and self.echiquier[5][x] == 0 and self.echiquier[6][x] == 0):
+    #             return False
+    #         for i in range(5, 7):
+    #             if self.est_attaque(i, x, -joueur):
+    #                 return False
+    #     else:
+    #         return False
+
+    #     return True
+    
+    # def est_attaque(self, y, x, joueur):
+    #     for j in range(8):
+    #         for i in range(8):
+    #             if self.echiquier[j][i] * joueur < 0:
+    #                 piece = abs(self.echiquier[j][i])
+    #                 mouvements_valides = []
+
+    #                 if piece == 1: # Pion
+    #                     mouvements_valides = self.mouvements_pion(j, i)
+    #                 elif piece == 2: # Cavalier
+    #                     mouvements_valides = self.mouvements_cavalier(j, i)
+    #                 elif piece == 3: # Fou
+    #                     mouvements_valides = self.mouvements_fou(j, i)
+    #                 elif piece == 4: # Tour
+    #                     mouvements_valides = self.mouvements_tour(j, i)
+    #                 elif piece == 5: # Dame
+    #                     mouvements_valides = self.mouvements_dame(j, i)
+    #                 elif piece == 6: # Roi
+    #                     mouvements_valides = self.mouvements_roi(j, i)
+
+    #                 if (y, x) in mouvements_valides:
+    #                     return True
+    #     return False
